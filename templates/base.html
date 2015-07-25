@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>{% block title %}{% endblock %}</title>
+    <meta name="description" content="Rabidquill.io: A secure cloud document editor.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href='http://fonts.googleapis.com/css?family=Roboto:400italic,700italic,700,400' rel='stylesheet' type='text/css'>
+    <style>
+        body {
+            font-family: "Roboto", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+        }
+    </style>
+    {% block headscripts %}{% endblock %}
+</head>
+<body>
+    {% block body %}
+    {% endblock %}
+    {% block footscripts %}{% endblock %}
+</body>
+</html>

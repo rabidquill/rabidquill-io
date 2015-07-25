@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Documents: rabidquill.io{% endblock %}
+{% block headscripts %}
+    <style>
+        table#list-container {
+            table-layout: fixed;
+            width:320px;
+            margin:2em auto;
+            border: solid 1px #000000;
+        }
+        table#list-container tr {
+            border-bottom: solid 1px #000000;
+        }
+        table#list-container tr:last-child {
+            border:none;
+        }
+        td.icon-cell {
+            width:32px;
+        }
+        td.delete-cell {
+            width:32px;
+        }
+        td.delete-cell a.deletebutton {
+            border: none;
+            background: none;
+            padding:0;
+        }
+        td.document-cell {
+            border-bottom: solid black 1px;
+        }
+        td.document-cell a {
+            text-decoration: none;
+            color: black;
+            padding: 0.5em;
+            width: 226px;
+            display: inline-block;
+        }
+        td.document-cell a:hover {
+            background-color: #EEEEEE;
+        }
+        form#newdoc {
+            padding: 1em;
+        }
+            div#container {
+            position:absolute;
+            top:0;
+            left:0;
+            width:100%;
+        }
+        div#title-bar {
+            width:100%;
+            background-color: #000000;
+            margin:0;
+        }
+        h2.site-title {
+            color:#FFFFFF;
+            margin:0;
+            padding:0.5em;
+        }
+        a.control {
+            color: #FFFFFF;
+            font-weight:bold;
+            text-decoration:none;
+            padding:1em;
+            float:right;
+        }
+        a.control:hover {
+            color:#000000;
+            background-color:#EEEEEE;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div id="container">
+        <div id="title-bar">
+            <a class="control" href="/logout/" onclick="logout();">Log Out</a>
+
+            <h2 class="site-title">Rabidquill.io</h2>
+        </div>
+        <table id="list-container">
+            {% for document in documents %}
+                <tr id="{{ document.id }}">
+                    <td class="icon-cell"><img src="/static/very-basic-file-icon.png"></td>
+                    <td class="document-cell"><a href="/edit/{{ document.id }}">{{ document.title }}</a></td>
+                    <td class="delete-cell"><a class="deletebutton" href="/delete/{{ document.id }}"><img src="/static/trash-icon.png"/></a></td></tr>
+            {% endfor %}
+            <tr><td>
+                <form name="newdoc" id="newdoc" method="POST">
+                    {% csrf_token %}
+                    <input type="text" name="title" id="title" placeholder="Document title"/>
+                    <input type="submit" value="Create New" name="create" id="create"/>
+                </form>
+            </td></tr>
+        </table>
+    </div>
+{% endblock %}
+{% block footscripts %}{% endblock %}

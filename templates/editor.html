@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}{{ document.title }} : rabidquill.io{% endblock %}
+{% block headscripts %}
+    <script>
+        var cipher = false;
+        var cookieArray = document.cookie.split(';');
+        for (var i=0; i<cookieArray.length; i++) {
+            var pair = cookieArray[i].split('=');
+            if(pair[0].trim()==="cipher") {
+                cipher = pair[1];
+            }
+        }
+        var encbody = '{{ document.body|safe }}';
+    </script>
+    <style>
+        body {
+            background-color: #EEEEEE;
+        }
+        div#container {
+            position:absolute;
+            top:0;
+            left:0;
+            width:100%;
+        }
+        div#title-bar {
+            width:100%;
+            background-color: #000000;
+            margin:0;
+        }
+        h2.site-title {
+            color:#FFFFFF;
+            margin:0;
+            padding:0.5em;
+        }
+        a.control {
+            color: #FFFFFF;
+            font-weight:bold;
+            text-decoration:none;
+            padding:1em;
+            float:right;
+        }
+        a.control:hover {
+            color:#000000;
+            background-color:#EEEEEE;
+        }
+        div#editor-container {
+            max-width:960px;
+            margin:1em auto 0 auto;
+        }
+        #editor {
+
+            padding:3em;
+            min-height: 500px !important;
+        }
+    </style>
+{% endblock %}
+{% block body %}
+    <div id="container">
+        <div id="title-bar">
+            <a class="control" href="/logout/" onclick="logout();">Log Out</a>
+            <a class="control" href="/documents/">Close Document</a>
+
+            <h2 class="site-title">Rabidquill.io</h2>
+        </div>
+        <div id="editor-container">
+            <form name="editorform" onsubmit="return false;">
+                {% csrf_token %}
+                <textarea name="editor" id="editor">{{ document.body }}</textarea>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+{% block footscripts %}
+    <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/aes.js"></script>
+    <script>window.CryptoJS.AES || document.write('<script src="/static/aes.js"><\/script>')</script>
+    <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha256.js"></script>
+    <script>window.CryptoJS.SHA256 || document.write('<script src="/static/sha256.js"><\/script>')</script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="/static/jquery-1.11.3.min.js"><\/script>')</script>
+    <script src="/static/JsonFormatter.js"></script>
+    <script>
+        var Save = function() {
+            $.ajax({
+                url: window.location.href,
+                type: "POST",
+                data: {
+                    csrfmiddlewaretoken: document.editorform.csrfmiddlewaretoken.value,
+                    action: "save",
+                    content: JsonFormatter.stringify(CryptoJS.AES.encrypt($("textarea#editor").val(), cipher,{format:JsonFormatter}))
+                },
+                success: function(data) {
+                    console.log(data);
+                }
+            });
+        };
+    </script>
+    <script src="//tinymce.cachefly.net/4.2/tinymce.min.js"></script>
+    <script>
+        if(encbody) {
+            $("textarea#editor").val(CryptoJS.AES.decrypt(encbody,cipher,{format:JsonFormatter}).toString(CryptoJS.enc.Utf8));
+        }
+        tinymce.init({
+            selector:'textarea',
+            plugins: 'save',
+            toolbar: 'save newdocument bold italic underline strikethrough alignleft aligncenter alignright alignjustify bullist numlist outdent indent blockquote undo redo removeformat subscript superscript',
+            autosave_interval: '20s',
+            save_onsavecallback: Save
+        });
+    </script>
+{% endblock %}
